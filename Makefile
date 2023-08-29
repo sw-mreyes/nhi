@@ -49,6 +49,13 @@ build-test-daemon:
 	clang -Wall -D TEST -c daemon/src/sqlite.c -o sqlite.o
 	clang -Wall nhi.o utils.o sqlite.o -lbpf -lelf -lz -lsqlite3 -o nhid
 
+build-debug-daemon:
+	clang -Wall -g -O2 -target bpf -D__TARGET_ARCH_x86 -c daemon/src/nhi.bpf.c -o nhi.bpf.o
+	clang -Wall -g -D TEST -c daemon/src/nhi.c -o nhi.o
+	clang -Wall -g -c daemon/src/utils.c -o utils.o
+	clang -Wall -g -D TEST -c daemon/src/sqlite.c -o sqlite.o
+	clang -Wall -g nhi.o utils.o sqlite.o -lbpf -lelf -lz -lsqlite3 -o nhid
+
 build-test-cli:
 	go build -o nhi -tags TEST main.go
 
@@ -58,3 +65,10 @@ create-test-db:
 
 format:
 	astyle --style=otbs --indent=spaces=2 *.c *.h --recursive --exclude=vendor && go fmt ./...
+
+clean:
+	-rm ./nhi.o
+	-rm ./utils.o
+	-rm ./sqlite.o
+	-rm ./nhid
+	-rm ./nhi.bpf.o
